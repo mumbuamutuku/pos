@@ -19,6 +19,8 @@ const Sidebar = () => {
         return currentUser.role === 'admin';
       case 'expense':
         return currentUser.role === 'admin' || currentUser.role === 'manager';
+      case 'customers':
+        return currentUser.role === 'admin' || currentUser.role === 'manager' || currentUser.role === 'cashier';
       default:
         return true;
     }
@@ -26,6 +28,7 @@ const Sidebar = () => {
 
   const tabs = [
     { id: 'pos', label: 'Point of Sale', icon: ShoppingCart, path: '/', access: true },
+    { id: 'customers', label: 'Customers', icon: User2, path: '/customers', access: canAccess('customers') },
     { id: 'inventory', label: 'Inventory', icon: Package, path: '/inventory', access: canAccess('inventory') },
     { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports', access: canAccess('reports') },
     { id: 'settings', label: 'Settings', icon: Package, path: '/settings', access: true },

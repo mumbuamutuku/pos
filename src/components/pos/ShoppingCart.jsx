@@ -1,4 +1,4 @@
-import { Plus, Minus, X, ShoppingCart as CartIcon, Percent, DollarSign, Calculator, Undo2 } from 'lucide-react';
+import { Plus, Minus, X, ShoppingCart as CartIcon, Percent, DollarSign, Calculator, Undo2, User } from 'lucide-react';
 import { useState } from 'react';
 
 const ShoppingCart = ({ 
@@ -7,16 +7,17 @@ const ShoppingCart = ({
   onRemoveItem, 
   onProcessSale,
   isProcessing,
-  showDiscount, // Add this prop
-  onToggleDiscount, // Add this prop
-  showRefund, // Add this prop
+  showDiscount,
+  onToggleDiscount,
+  showRefund,
   onToggleRefund, 
   discountType, 
   onDiscountTypeChange,
   discountValue,
   onDiscountValueChange,
   saleNotes,
-  onSaleNotesChange
+  onSaleNotesChange,
+  selectedCustomer
 }) => {
   
   // Calculate values needed for display
@@ -31,6 +32,19 @@ const ShoppingCart = ({
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-lg font-semibold mb-4">Shopping Cart ({cart.length})</h2>
+      
+      {/* Customer Info Display */}
+      {selectedCustomer && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center gap-2">
+            <User size={16} className="text-blue-600" />
+            <div>
+              <p className="font-medium text-sm text-blue-900">{selectedCustomer.name}</p>
+              <p className="text-xs text-blue-700">{selectedCustomer.phone}</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       {cart.length === 0 ? (
         <div className="text-center text-gray-500 mt-8">
@@ -77,7 +91,7 @@ const ShoppingCart = ({
               <h3 className="font-semibold mb-3">Discount</h3>
               <div className="flex gap-2 mb-3">
                 <button
-                  onClick={() => setDiscountType('percentage')}
+                  onClick={() => onDiscountTypeChange('percentage')}
                   className={`px-3 py-2 rounded text-sm ${
                     discountType === 'percentage' ? 'bg-blue-600 text-white' : 'bg-gray-200'
                   }`}
@@ -86,7 +100,7 @@ const ShoppingCart = ({
                   %
                 </button>
                 <button
-                  onClick={() => setDiscountType('fixed')}
+                  onClick={() => onDiscountTypeChange('fixed')}
                   className={`px-3 py-2 rounded text-sm ${
                     discountType === 'fixed' ? 'bg-blue-600 text-white' : 'bg-gray-200'
                   }`}
@@ -99,11 +113,11 @@ const ShoppingCart = ({
                 type="number"
                 placeholder={`Enter ${discountType === 'percentage' ? 'percentage' : 'amount'}`}
                 value={discountValue}
-                onChange={(e) => setDiscountValue(Number(e.target.value))}
+                onChange={(e) => onDiscountValueChange(Number(e.target.value))}
                 className="w-full px-3 py-2 border rounded-lg mb-2"
               />
               <button
-                onClick={() => setShowDiscount(false)}
+                onClick={() => onToggleDiscount()}
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
                 Hide Discount
@@ -116,7 +130,7 @@ const ShoppingCart = ({
             <textarea
               placeholder="Sale notes..."
               value={saleNotes}
-              onChange={(e) => setSaleNotes(e.target.value)}
+              onChange={(e) => onSaleNotesChange(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg text-sm"
               rows={2}
             />
@@ -151,7 +165,7 @@ const ShoppingCart = ({
           {/* Action Buttons */}
           <div className="p-4 border-t space-y-2">
             <button
-              onClick={() => setShowDiscount(!showDiscount)}
+              onClick={onToggleDiscount}
               className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
             >
               <Calculator size={16} />
@@ -167,7 +181,7 @@ const ShoppingCart = ({
             </button>
             
             <button
-              onClick={() => setShowRefund(true)}
+              onClick={() => onToggleRefund(true)}
               className="w-full py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
             >
               <Undo2 size={16} />
@@ -183,7 +197,9 @@ const ShoppingCart = ({
               <div>F3: Complete</div>
               <div>F4: Clear Cart</div>
               <div>F5: Refund</div>
+              <div>F6: Customer</div>
               <div>+/-: Quantity</div>
+              <div>ESC: Cancel</div>
             </div>
           </div>
         </>
@@ -202,7 +218,7 @@ const ShoppingCart = ({
             />
             <div className="flex gap-2">
               <button
-                onClick={() => setShowRefund(false)}
+                onClick={() => onToggleRefund(false)}
                 className="flex-1 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
               >
                 Cancel
@@ -210,7 +226,7 @@ const ShoppingCart = ({
               <button
                 onClick={() => {
                   alert('Refund functionality will be implemented');
-                  setShowRefund(false);
+                  onToggleRefund(false);
                 }}
                 className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >

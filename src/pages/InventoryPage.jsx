@@ -13,7 +13,7 @@ const InventoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
-   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
@@ -654,7 +654,7 @@ const InventoryPage = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Margin</th>
-              {canAccess('edit_product') && (
+              {(canAccess('edit_product') || canAccess('delete_product')) && (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               )}
             </tr>
@@ -739,17 +739,27 @@ const InventoryPage = () => {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {(((item.price - item.cost) / item.cost) * 100).toFixed(1)}%
-                </td>
+                </td> 
+                <td className="px-6 py-4">
+                  <div className="flex space-x-2">
                 {canAccess('edit_product') && (
-                  <td className="px-6 py-4">
                     <button
                       onClick={() => setEditingItem(editingItem === item.id ? null : item.id)}
                       className="text-indigo-600 hover:text-indigo-800"
                     >
                       {editingItem === item.id ? <Save size={16} /> : <Edit2 size={16} />}
                     </button>
-                  </td>
                 )}
+                {canAccess('delete_product') && (
+                  <button
+                    onClick={() =>handleDeleteItem(item.id)}
+                    className="text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+                </div>
+                 </td>
               </tr>
             ))}
           </tbody>

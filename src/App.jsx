@@ -7,6 +7,7 @@ import ReportsPage from './pages/ReportsPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UsersPage from './pages/UsersPage';
 import ExpensePage from './pages/ExpensePage';
+import CustomerManagement from './pages/CustomerManagement';
 
 function App() {
   return (
@@ -40,6 +41,11 @@ function App() {
               <ExpensePage />
               </ProtectedRoute>
           } />
+          <Route path="/customers" element={ 
+            <ProtectedRoute requiredRole="admin">
+              <CustomerManagement />
+              </ProtectedRoute>
+          }/>
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Route>
       </Routes>

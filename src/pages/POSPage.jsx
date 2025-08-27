@@ -1,5 +1,6 @@
 import ProductGrid from '../components/pos/ProductGrid';
 import ShoppingCart from '../components/pos/ShoppingCart';
+import CustomerManagement from './CustomerManagement';
 import { useInventory } from '../hooks/useInventory';
 import { useState, useEffect } from 'react';
 import { createSale } from '../api/pos';
@@ -15,7 +16,8 @@ const POSPage = () => {
   const [discountType, setDiscountType] = useState('percentage'); 
   const [discountValue, setDiscountValue] = useState(0); 
   const [saleNotes, setSaleNotes] = useState(''); 
-  
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
   const addToCart = (item) => {
     if (item.stock <= 0) return;
     
@@ -66,7 +68,14 @@ const POSPage = () => {
         ? subtotal * (discountValue / 100) 
         : discountValue;
 
+      console.log("Customer", selectedCustomer);
       const saleData = {
+        customer_id: selectedCustomer ? selectedCustomer.id : null,
+        customer_info: selectedCustomer ? {
+          name: selectedCustomer.name,
+          phone: selectedCustomer.phone,
+          email: selectedCustomer.email
+        } : null,
         items: cart.map(item => {
           const itemSubtotal = item.price * item.quantity;
           const itemDiscount = discountAmount * (itemSubtotal / subtotal);
@@ -87,10 +96,12 @@ const POSPage = () => {
         total_amount: subtotal - discountAmount
       };
       
+      console.log(saleData);
       await createSale(saleData);
       
       // Clear cart on successful sale
       setCart([]);
+      setSelectedCustomer(null);
       setDiscountValue(0);
       setSaleNotes('');
       // You might want to refresh inventory here
@@ -99,6 +110,13 @@ const POSPage = () => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const clearCart = () => {
+    setCart([]);
+    setSelectedCustomer(null);
+    setDiscountValue(0);
+    setSaleNotes('');
   };
 
   // Keyboard shortcuts
@@ -164,7 +182,14 @@ const POSPage = () => {
           recentItems={recentItems}
         />
       </div>
-      <div className="lg:col-span-1">
+      
+      <div className="lg:col-span-1 space-y-4">
+        <CustomerManagement
+          isEmbedded={true}
+          selectedCustomer={selectedCustomer}
+          onSelectCustomer={setSelectedCustomer}
+          onClearCustomer={() => setSelectedCustomer(null)}
+        />
         <ShoppingCart 
           cart={cart} 
           onUpdateQuantity={updateCartQuantity}
@@ -181,6 +206,8 @@ const POSPage = () => {
           onDiscountValueChange={setDiscountValue}
           saleNotes={saleNotes}
           onSaleNotesChange={setSaleNotes}
+          selectedCustomer={selectedCustomer}
+          onClearCart={clearCart}
         />
       </div>
     </div>
